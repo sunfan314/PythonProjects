@@ -1,7 +1,7 @@
 import sys
 import pygame
 from bullet import Bullet
-
+from alien import Alien
 
 def check_events(ai_settings,screen,ship,bullets):
 	# response to keyboard and mouse events
@@ -40,13 +40,38 @@ def check_keyup_events(event,ship):
 		ship.moving_up = False
 	elif event.key == pygame.K_DOWN:
 		ship.moving_down = False
-def update_screen(ai_settings,screen,ship,bullets):
+def create_fleet(ai_settings,screen,ship,aliens):
+	alien = Alien(ai_settings,screen)
+	number_aliens_x = get_number_aliens_x(ai_settings,alien.rect.width)
+	number_aliens_y = get_number_aliens_y(ai_settings,ship.rect.height,alien.rect.height)
+	for row_number in range(number_aliens_y):
+		for alien_number in range(number_aliens_x):
+			create_alien(ai_settings,screen,aliens,alien_number,row_number)
+def get_number_aliens_x(ai_settings,alien_width):
+	available_space_x = ai_settings.screen_width - 2 * alien_width
+	number_aliens_x = int(available_space_x / (2 * alien_width))
+	return number_aliens_x
+def get_number_aliens_y(ai_settings,ship_height,alien_height):
+	available_space_y = ai_settings.screen_height - 3 * alien_height - ship_height
+	number_alien_y = int(available_space_y / (2 * alien_height))
+	return number_alien_y
+def create_alien(ai_settings,screen,aliens,alien_number,row_number):
+	alien = Alien(ai_settings,screen)
+	alien_width = alien.rect.width
+	alien_height = alien.rect.height
+	alien.x = alien_width + 2 * alien_width * alien_number
+	alien.y = alien_height + 2 * alien_height * row_number
+	alien.rect.x = alien.x
+	alien.rect.y = alien.y
+	aliens.add(alien) 
+def update_screen(ai_settings,screen,ship,aliens,bullets):
 		#re-draw screen
 		screen.fill(ai_settings.bg_color)
 		#draw bullets
 		for bullet in bullets.sprites():
 			bullet.draw_bullet()
 		ship.blitme()
+		aliens.draw(screen)
 		#make recently drawed screen visible
 		pygame.display.flip()
 def update_bullets(bullets):
@@ -54,4 +79,6 @@ def update_bullets(bullets):
 	for bullet in bullets.copy():
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
+def update_aliens(aliens):
+	aliens.update()
 		
