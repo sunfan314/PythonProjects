@@ -38,3 +38,6 @@ class Ship():
             self.bottom += self.ai_settings.ship_speed_factor
         self.rect.centerx = self.centerx
         self.rect.bottom = self.bottom
+    def center_ship(self):
+        self.center = self.screen_rect.centerx
+    

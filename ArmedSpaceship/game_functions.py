@@ -2,6 +2,7 @@ import sys
 import pygame
 from bullet import Bullet
 from alien import Alien
+from time import sleep
 
 def check_events(ai_settings,screen,ship,bullets):
 	# response to keyboard and mouse events
@@ -13,6 +14,16 @@ def check_events(ai_settings,screen,ship,bullets):
 		elif event.type == pygame.KEYUP:
 			check_keyup_events(event,ship)
 
+def ship_hit(ai_settings,status,screen,ship,aliens,bullets):
+	if status.ships_left > 0:
+		status.ships_left -= 1
+		aliens.empty()
+		bullets.empty()
+		create_fleet(ai_settings,screen,ship,aliens)
+		ship.center_ship()
+		sleep(0.5)
+	else:
+		status.game_active = False
 
 def check_keydown_events(event,ai_settings,screen,ship,bullets):
 	if event.key == pygame.K_q:
@@ -74,11 +85,37 @@ def update_screen(ai_settings,screen,ship,aliens,bullets):
 		aliens.draw(screen)
 		#make recently drawed screen visible
 		pygame.display.flip()
-def update_bullets(bullets):
+def update_bullets(ai_settings,screen,ship,aliens,bullets):
 	bullets.update()
 	for bullet in bullets.copy():
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
-def update_aliens(aliens):
+	check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets)
+def check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets):
+	collisions = pygame.sprite.groupcollide(bullets,aliens,True,True)
+	if len(aliens) == 0:
+		bullets.empty()
+		create_fleet(ai_settings,screen,ship,aliens)
+def update_aliens(ai_settings,status,screen,ship,aliens,bullets):
+	check_fleet_edges(ai_settings,aliens)
 	aliens.update()
-		
+
+	if pygame.sprite.spritecollideany(ship,aliens):
+		ship_hit(ai_settings,status,screen,ship,aliens,bullets)
+	check_aliens_bottom(ai_settings,status,screen,ship,aliens,bullets)
+def check_fleet_edges(ai_settings,aliens):
+	for alien in aliens.sprites():
+		if alien.check_edges():
+			change_fleet_direction(ai_settings,aliens)
+			break
+def change_fleet_direction(ai_settings,aliens):
+	for alien in aliens.sprites():
+		alien.rect.y += ai_settings.fleet_drop_speed
+	ai_settings.fleet_direction *= -1
+def check_aliens_bottom(ai_settings,status,screen,ship,aliens,bullets):
+	screen_rect = screen.get_rect()
+	for alien in aliens.sprites():
+		if alien.rect.bottom >= screen_rect.bottom:
+			ship_hit(ai_settings,status,screen,ship,aliens,bullets)
+
+
