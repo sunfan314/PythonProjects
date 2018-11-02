@@ -3,7 +3,7 @@ import sys
 import random
 
 # 全局定义
-SCREEN_X = 800
+SCREEN_X = 600
 SCREEN_Y = 600
 
 
