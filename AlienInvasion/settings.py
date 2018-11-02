@@ -14,14 +14,14 @@ class Settings():
 		self.bullets_allowed = 10
 
 		#alien config
-		self.fleet_drop_speed = 10
+		self.fleet_drop_speed = 1
 		self.speedup_scale = 1.3    
 		self.score_scale = 1.5   
 		self.initialize_dynamic_settings()
 	def initialize_dynamic_settings(self):
-		self.ship_speed_factor = 15 
-		self.bullet_speed_factor = 20 
-		self.alien_speed_factor = 10
+		self.ship_speed_factor = 1
+		self.bullet_speed_factor = 1 
+		self.alien_speed_factor = 0.5
 		self.fleet_direction = 1
 
 		self.alien_points = 50
